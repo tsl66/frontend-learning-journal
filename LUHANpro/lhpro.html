@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自动轮播图片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      padding: 20px;
+      background-color: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 轮播容器 */
+    .carousel {
+      position: relative;
+      max-width: 90%;
+      max-height: 80vh;
+    }
+    img {
+      max-width: 100%;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    /* 左右箭头 */
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background-color: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .arrow-left {
+      left: -50px;
+    }
+    .arrow-right {
+      right: -50px;
+    }
+    /* 指示器点点 */
+    .dots {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+      cursor: pointer;
+    }
+    .dot.active {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <img src="lhimg1.jpg" alt="" id="carouselImg">
+    <button class="arrow arrow-left" id="prevBtn">&lt;</button>
+    <button class="arrow arrow-right" id="nextBtn">&gt;</button>
+  </div>
+  <div class="dots" id="dotsContainer"></div>
+
+  <script>
+    // 配置
+    const totalImages = 6; // 图片总数 lhimg1~6
+    let currentIndex = 0;  // 当前显示第几张（从0开始）
+    let autoPlayTimer;    // 自动轮播定时器
+
+    // DOM元素
+    const imgEl = document.getElementById('carouselImg');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dotsContainer');
+
+    // 初始化指示器点点
+    function initDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalImages; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === currentIndex) dot.classList.add('active');
+        dot.addEventListener('click', () => goToIndex(i));
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // 切换到指定索引的图片
+    function goToIndex(index) {
+      currentIndex = (index + totalImages) % totalImages; // 防止越界
+      imgEl.src = `lhimg${currentIndex + 1}.jpg`;
+      updateDots();
+      resetAutoPlay(); // 切换后重置自动轮播
+    }
+
+    // 更新指示器状态
+    function updateDots() {
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+      });
+    }
+
+    // 上一张
+    function goPrev() {
+      goToIndex(currentIndex - 1);
+    }
+
+    // 下一张
+    function goNext() {
+      goToIndex(currentIndex + 1);
+    }
+
+    // 启动自动轮播
+    function startAutoPlay(interval = 3000) {
+      autoPlayTimer = setInterval(goNext, interval);
+    }
+
+    // 重置自动轮播（手动操作后重新计时）
+    function resetAutoPlay() {
+      clearInterval(autoPlayTimer);
+      startAutoPlay();
+    }
+
+    // 绑定事件
+    prevBtn.addEventListener('click', goPrev);
+    nextBtn.addEventListener('click', goNext);
+
+    // 初始化
+    initDots();
+    startAutoPlay(); // 启动自动轮播
+  </script>
+</body>
+</html>
